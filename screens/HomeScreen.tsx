@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -8,13 +8,12 @@ import {
   View,
   TextInput,
   Alert,
-  Modal,
 } from 'react-native';
 import axios from 'axios';
 
 import Item from '../components/Item';
 import FavoritesModal from '../components/FavoritesModal';
-import Show from '../types'
+import Show from '../types';
 
 const HomeScreen: React.FC<{
   navigation: any;
@@ -28,25 +27,24 @@ const HomeScreen: React.FC<{
 
   async function fetchSeries(query: string) {
     setLoading(true);
-    checkInternetConnection();
+    const reqStart = Date.now();
+
     try {
       const response = await axios.get(
         `https://api.tvmaze.com/search/shows?q=${query}`,
       );
-
       setResults(response.data);
       setLoading(false);
     } catch (error: any) {
       Alert.alert('Something went wrong!', error.toString());
     }
-  }
 
-  const checkInternetConnection = () => {
-    setTimeout(() => {
-      if (loading)
-        Alert.alert('Slow loading time?', 'Check your internet connection');
-    }, 3000);
-  };
+    if (Date.now() - reqStart > 3000)
+      Alert.alert(
+        'Slow loading time?',
+        'You might want to check your internet connection',
+      );
+  }
 
   const handleFavorite = (show: Show) => {
     if (!favorites.includes(show)) setFavorites([...favorites, show]);
